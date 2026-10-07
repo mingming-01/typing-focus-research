@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>시각 요소와 타이핑 속도</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="experiment.js" defer></script>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="page-header">
+      <p class="eyebrow">타이핑 실험 · 10회</p>
+      <h1>시각 요소와 타이핑 속도</h1>
+      <p class="intro">
+        문장을 그대로 입력하고 Enter를 누르세요.
+        첫 글자부터 시간이 측정됩니다.
+      </p>
+    </header>
+
+    <section id="loading-panel" class="panel loading-panel" aria-live="polite">
+      <p id="loading-message">실험 문장을 불러오는 중입니다…</p>
+
+      <div id="load-control" class="load-control" hidden>
+        <p>
+          자동으로 불러오지 못했습니다.
+          프로젝트의 <code>sentences.json</code> 파일을 선택해 주세요.
+        </p>
+
+        <label class="file-button" for="sentence-file">
+          sentences.json 선택
+        </label>
+
+        <input
+          id="sentence-file"
+          class="visually-hidden"
+          type="file"
+          accept=".json,application/json"
+        >
+      </div>
+    </section>
+
+    <div id="experiment-app" hidden>
+      <section
+        class="panel experiment-panel"
+        aria-labelledby="trial-heading"
+      >
+        <!--
+          실험 카드 전체를 시각 자극 영역으로 사용한다.
+          ON 조건에서 이 영역의 랜덤한 위치에 효과가 생성된다.
+        -->
+        <div
+          id="visual-effects"
+          class="visual-effects"
+          aria-hidden="true"
+        ></div>
+
+        <div class="experiment-content">
+          <div class="trial-topline">
+            <div>
+              <p class="eyebrow">진행 상황</p>
+              <h2 id="trial-heading">
+                실험 <span id="trial-number">1</span> / 10
+              </h2>
+            </div>
+
+            <div
+              id="condition-badge"
+              class="condition-badge"
+              aria-live="polite"
+            >
+              시각 요소 OFF
+            </div>
+          </div>
+
+          <div class="typing-area">
+            <div class="sentence-area">
+              <p class="section-label">제시 문장</p>
+              <p id="sentence-text" class="sentence-text"></p>
+            </div>
+
+            <label class="section-label" for="typing-input">
+              입력
+              <span class="hint">Enter로 완료</span>
+            </label>
+
+            <textarea
+              id="typing-input"
+              rows="2"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              aria-describedby="input-help"
+              disabled
+            ></textarea>
+
+            <p id="input-help" class="input-help">
+              직접 입력하세요. 붙여넣기는 사용할 수 없으며 오타는 백스페이스로 수정할 수 있습니다.
+            </p>
+          </div>
+
+          <div
+            class="metrics"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <div class="metric">
+              <span class="metric-label">타수</span>
+              <strong>
+                <span id="speed-value">0</span>
+                <small>타</small>
+              </strong>
+            </div>
+
+            <div class="metric">
+              <span class="metric-label">정확도</span>
+              <strong>
+                <span id="accuracy-value">0</span>
+                <small>%</small>
+              </strong>
+            </div>
+
+            <div class="metric">
+              <span class="metric-label">시간</span>
+              <strong>
+                <span id="elapsed-value">0.0</span>
+                <small>초</small>
+              </strong>
+            </div>
+          </div>
+
+          <p
+            id="trial-status"
+            class="trial-status"
+            role="status"
+            aria-live="polite"
+          >
+            첫 글자를 입력하세요.
+          </p>
+
+          <details class="measurement-details">
+            <summary>타수 계산 방식</summary>
+
+            <p class="measurement-note">
+              입력창에 남아 있는 한글을 표준 두벌식 자모 입력 수로
+              환산합니다 (초성 1타, 단순 모음·받침 1타,
+              겹모음·겹받침 2타).
+              공백·문장부호와 그 밖의 유니코드 문자는 각각 1타이며,
+              백스페이스로 지운 문자는 세지 않습니다.
+              환산 타수 × 60 ÷ 경과 초로 분당 타수를 계산합니다.
+              정확도는 목표 문장과 입력의 편집 거리로 계산합니다.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <section
+        id="results-section"
+        class="panel results-panel"
+        hidden
+        aria-labelledby="results-heading"
+      >
+        <div class="results-header">
+          <div>
+            <p class="eyebrow">실험 완료</p>
+            <h2 id="results-heading">10회 결과</h2>
+          </div>
+
+          <button
+            id="download-csv"
+            class="download-button"
+            type="button"
+          >
+            CSV 다운로드
+          </button>
+        </div>
+
+        <p class="results-note">
+          결과는 현재 브라우저 탭에만 보관됩니다.
+          페이지를 닫기 전에 CSV를 다운로드하세요.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>실험</th>
+                <th>조건</th>
+                <th>타수</th>
+                <th>정확도</th>
+                <th>시간(초)</th>
+              </tr>
+            </thead>
+
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+
+        <p
+          id="download-status"
+          class="download-status"
+          role="status"
+          aria-live="polite"
+        ></p>
+      </section>
+    </div>
+
+    <noscript>
+      <p class="panel error-message">
+        이 실험을 진행하려면 브라우저에서 JavaScript를 활성화해야 합니다.
+      </p>
+    </noscript>
+
+    <footer class="page-footer">
+      외부 이미지·API 없이 이 브라우저에서만 실행됩니다.
+    </footer>
+  </main>
+</body>
+</html>

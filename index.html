@@ -1,220 +1,649 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f7fb">
-  <title>시각 요소와 타이핑 속도</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="experiment.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="시각적 효과가 타이핑 성능에 미치는 영향을 직접 실험하고 분석한 연구 프로젝트"
+    >
+    <title>T10 · AI와 함께 쓰는 첫 논문</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6fa;
+            color: #20242d;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Noto Sans KR",
+                "Malgun Gothic",
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .page-shell {
+            width: min(920px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 56px 0 64px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 44px;
+            color: #687286;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .back-link:hover {
+            color: #20242d;
+        }
+
+        .hero {
+            margin-bottom: 56px;
+        }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            color: #65708a;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(32px, 6vw, 52px);
+            line-height: 1.15;
+            letter-spacing: -0.05em;
+        }
+
+        .hero h2 {
+            margin: 16px 0 0;
+            color: #4c5565;
+            font-size: clamp(20px, 3vw, 28px);
+            line-height: 1.4;
+            letter-spacing: -0.04em;
+        }
+
+        .hero-description {
+            max-width: 680px;
+            margin: 22px 0 0;
+            color: #687286;
+            font-size: 15px;
+            line-height: 1.85;
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            margin-top: 20px;
+            color: #8a93a2;
+            font-size: 12px;
+        }
+
+        .section {
+            margin-top: 24px;
+            padding: 32px;
+            border: 1px solid #e3e7ef;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 14px 40px rgba(33, 45, 70, 0.06);
+        }
+
+        .section-label {
+            margin: 0 0 18px;
+            color: #65708a;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .section h3 {
+            margin: 0;
+            font-size: 24px;
+            line-height: 1.35;
+            letter-spacing: -0.04em;
+        }
+
+        .section p {
+            margin: 14px 0 0;
+            color: #5f6878;
+            font-size: 14px;
+            line-height: 1.85;
+        }
+
+        .question {
+            margin-top: 22px;
+            padding: 22px;
+            border-radius: 14px;
+            background: #f7f8fb;
+        }
+
+        .question strong {
+            display: block;
+            color: #20242d;
+            font-size: 19px;
+            line-height: 1.5;
+            letter-spacing: -0.03em;
+        }
+
+        .hypothesis {
+            margin-top: 16px;
+            padding: 22px;
+            border-left: 3px solid #8f86c8;
+            background: #faf9ff;
+        }
+
+        .hypothesis p {
+            margin: 0;
+            color: #4f5665;
+        }
+
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .method-card {
+            min-height: 130px;
+            padding: 18px;
+            border: 1px solid #e7eaf0;
+            border-radius: 14px;
+            background: #fafbfc;
+        }
+
+        .method-card strong {
+            display: block;
+            margin-bottom: 9px;
+            color: #20242d;
+            font-size: 15px;
+        }
+
+        .method-card span {
+            color: #737d90;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .result-card {
+            padding: 20px;
+            border: 1px solid #e7eaf0;
+            border-radius: 14px;
+            background: #fafbfc;
+        }
+
+        .result-card .label {
+            display: block;
+            margin-bottom: 12px;
+            color: #737d90;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .result-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .result-value span {
+            display: block;
+            margin-bottom: 4px;
+            color: #929aaa;
+            font-size: 11px;
+        }
+
+        .result-value strong {
+            font-size: 22px;
+            letter-spacing: -0.04em;
+        }
+
+        .change-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .change-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 13px 0;
+            border-top: 1px solid #edf0f4;
+            color: #687286;
+            font-size: 13px;
+        }
+
+        .change-item strong {
+            color: #20242d;
+        }
+
+        .judgment {
+            margin-top: 22px;
+            padding: 22px;
+            border-radius: 14px;
+            background: #f7f8fb;
+        }
+
+        .judgment strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #20242d;
+            font-size: 17px;
+        }
+
+        .judgment p {
+            margin: 0;
+        }
+
+        .work-flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 22px;
+        }
+
+        .work-step {
+            padding: 9px 12px;
+            border-radius: 999px;
+            background: #f0f2f6;
+            color: #5f6878;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .arrow {
+            color: #a0a7b4;
+            font-size: 12px;
+        }
+
+        .links {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .project-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 58px;
+            padding: 0 17px;
+            border: 1px solid #dfe4ec;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #343b48;
+            font-size: 13px;
+            font-weight: 700;
+            transition:
+                transform 0.15s ease,
+                border-color 0.15s ease,
+                background 0.15s ease;
+        }
+
+        .project-link:hover {
+            transform: translateY(-2px);
+            border-color: #b9c0cd;
+            background: #fafbfc;
+        }
+
+        .footer {
+            margin-top: 32px;
+            color: #9aa2b1;
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 680px) {
+            .page-shell {
+                width: min(100% - 20px, 920px);
+                padding-top: 30px;
+            }
+
+            .section {
+                padding: 22px;
+            }
+
+            .method-grid,
+            .result-grid,
+            .links {
+                grid-template-columns: 1fr;
+            }
+
+            .change-item {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .work-flow {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <main class="page-shell">
-    <header class="page-header">
-      <p class="eyebrow">타이핑 실험 · 10회</p>
-      <h1>시각 요소와 타이핑 속도</h1>
-      <p class="intro">
-        문장을 그대로 입력하고 Enter를 누르세요.
-        첫 글자부터 시간이 측정됩니다.
-      </p>
-    </header>
+    <main class="page-shell">
 
-    <section id="loading-panel" class="panel loading-panel" aria-live="polite">
-      <p id="loading-message">실험 문장을 불러오는 중입니다…</p>
+        <a class="back-link" href="experiment.html">
+            ← 실험 페이지로 돌아가기
+        </a>
 
-      <div id="load-control" class="load-control" hidden>
-        <p>
-          자동으로 불러오지 못했습니다.
-          프로젝트의 <code>sentences.json</code> 파일을 선택해 주세요.
-        </p>
+        <header class="hero">
+            <p class="eyebrow">T10 · RESEARCH PROJECT</p>
 
-        <label class="file-button" for="sentence-file">
-          sentences.json 선택
-        </label>
+            <h1>AI와 함께 쓰는 첫 논문</h1>
 
-        <input
-          id="sentence-file"
-          class="visually-hidden"
-          type="file"
-          accept=".json,application/json"
-        >
-      </div>
-    </section>
+            <h2>시각적 효과가 타이핑 성능에 미치는 영향</h2>
 
-    <div id="experiment-app" hidden>
-      <section
-        class="panel experiment-panel"
-        aria-labelledby="trial-heading"
-      >
-        <!--
-          실험 카드 전체를 시각 자극 영역으로 사용한다.
-          ON 조건에서 이 영역의 랜덤한 위치에 효과가 생성된다.
-        -->
-        <div
-          id="visual-effects"
-          class="visual-effects"
-          aria-hidden="true"
-        ></div>
-
-        <div class="experiment-content">
-          <div class="trial-topline">
-            <div>
-              <p class="eyebrow">진행 상황</p>
-              <h2 id="trial-heading">
-                실험 <span id="trial-number">1</span> / 10
-              </h2>
-            </div>
-
-            <div
-              id="condition-badge"
-              class="condition-badge"
-              aria-live="polite"
-            >
-              시각 요소 OFF
-            </div>
-          </div>
-
-          <div class="typing-area">
-            <div class="sentence-area">
-              <p class="section-label">제시 문장</p>
-              <p id="sentence-text" class="sentence-text"></p>
-            </div>
-
-            <label class="section-label" for="typing-input">
-              입력
-              <span class="hint">Enter로 완료</span>
-            </label>
-
-            <textarea
-              id="typing-input"
-              rows="2"
-              autocomplete="off"
-              autocapitalize="off"
-              spellcheck="false"
-              aria-describedby="input-help"
-              disabled
-            ></textarea>
-
-            <p id="input-help" class="input-help">
-              직접 입력하세요. 붙여넣기는 사용할 수 없으며 오타는 백스페이스로 수정할 수 있습니다.
+            <p class="hero-description">
+                컴퓨터 화면에서 발생하는 시각적 효과가 실제 작업 수행에
+                영향을 주는지 궁금해서, 타이핑 작업으로 범위를 좁혀
+                직접 실험하고 데이터를 분석한 연구 프로젝트입니다.
             </p>
-          </div>
 
-          <div
-            class="metrics"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            <div class="metric">
-              <span class="metric-label">타수</span>
-              <strong>
-                <span id="speed-value">0</span>
-                <small>타</small>
-              </strong>
+            <div class="meta">
+                <span>작성자: 허민</span>
+                <span>직접 수행한 비교 실험</span>
+                <span>데이터 수집: 2026-10-06</span>
+            </div>
+        </header>
+
+
+        <section class="section">
+            <p class="section-label">01 · QUESTION</p>
+
+            <h3>무엇이 궁금했는가?</h3>
+
+            <div class="question">
+                <strong>
+                    시각적 효과가 타이핑 성능에 영향을 주는가?
+                </strong>
             </div>
 
-            <div class="metric">
-              <span class="metric-label">정확도</span>
-              <strong>
-                <span id="accuracy-value">0</span>
-                <small>%</small>
-              </strong>
-            </div>
-
-            <div class="metric">
-              <span class="metric-label">시간</span>
-              <strong>
-                <span id="elapsed-value">0.0</span>
-                <small>초</small>
-              </strong>
-            </div>
-          </div>
-
-          <p
-            id="trial-status"
-            class="trial-status"
-            role="status"
-            aria-live="polite"
-          >
-            첫 글자를 입력하세요.
-          </p>
-
-          <details class="measurement-details">
-            <summary>타수 계산 방식</summary>
-
-            <p class="measurement-note">
-              입력창에 남아 있는 한글을 표준 두벌식 자모 입력 수로
-              환산합니다 (초성 1타, 단순 모음·받침 1타,
-              겹모음·겹받침 2타).
-              공백·문장부호와 그 밖의 유니코드 문자는 각각 1타이며,
-              백스페이스로 지운 문자는 세지 않습니다.
-              환산 타수 × 60 ÷ 경과 초로 분당 타수를 계산합니다.
-              정확도는 목표 문장과 입력의 편집 거리로 계산합니다.
+            <p>
+                처음에는 집중도나 생산성처럼 직접 측정하기 어려운 개념도
+                고려했습니다. 이후 짧은 기간 안에 직접 데이터를 수집하고
+                숫자로 비교할 수 있도록 타이핑 속도와 정확도를 중심으로
+                연구 범위를 좁혔습니다.
             </p>
-          </details>
-        </div>
-      </section>
 
-      <section
-        id="results-section"
-        class="panel results-panel"
-        hidden
-        aria-labelledby="results-heading"
-      >
-        <div class="results-header">
-          <div>
-            <p class="eyebrow">실험 완료</p>
-            <h2 id="results-heading">10회 결과</h2>
-          </div>
+            <div class="hypothesis">
+                <p>
+                    <strong>가설</strong><br>
+                    시각적 효과가 있는 조건에서는 시각적 효과가 없는
+                    조건보다 타이핑 성능이 낮아질 것이다.
+                </p>
+            </div>
+        </section>
 
-          <button
-            id="download-csv"
-            class="download-button"
-            type="button"
-          >
-            CSV 다운로드
-          </button>
-        </div>
 
-        <p class="results-note">
-          결과는 현재 브라우저 탭에만 보관됩니다.
-          페이지를 닫기 전에 CSV를 다운로드하세요.
-        </p>
+        <section class="section">
+            <p class="section-label">02 · METHOD</p>
 
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>실험</th>
-                <th>조건</th>
-                <th>타수</th>
-                <th>정확도</th>
-                <th>시간(초)</th>
-              </tr>
-            </thead>
+            <h3>어떻게 실험했는가?</h3>
 
-            <tbody id="results-body"></tbody>
-          </table>
-        </div>
+            <div class="method-grid">
 
-        <p
-          id="download-status"
-          class="download-status"
-          role="status"
-          aria-live="polite"
-        ></p>
-      </section>
-    </div>
+                <article class="method-card">
+                    <strong>조건</strong>
+                    <span>
+                        시각적 효과가 없는 OFF와
+                        시각적 효과가 적용된 ON을 비교했습니다.
+                    </span>
+                </article>
 
-    <noscript>
-      <p class="panel error-message">
-        이 실험을 진행하려면 브라우저에서 JavaScript를 활성화해야 합니다.
-      </p>
-    </noscript>
+                <article class="method-card">
+                    <strong>측정값</strong>
+                    <span>
+                        타이핑 속도, 정확도,
+                        입력에 걸린 시간을 측정했습니다.
+                    </span>
+                </article>
 
-    <footer class="page-footer">
-      외부 이미지·API 없이 이 브라우저에서만 실행됩니다.
-    </footer>
-  </main>
+                <article class="method-card">
+                    <strong>실험 데이터</strong>
+                    <span>
+                        총 30회<br>
+                        OFF 15회 · ON 15회
+                    </span>
+                </article>
+
+            </div>
+
+            <p>
+                원자료는 실험 프로그램에서 CSV로 저장했습니다.
+                중복 파일을 확인한 뒤 동일한 기록이 두 번 집계되지 않도록
+                제외하고, 서로 다른 3개 파일의 30회 기록을 분석했습니다.
+            </p>
+        </section>
+
+
+        <section class="section">
+            <p class="section-label">03 · RESULT</p>
+
+            <h3>실험에서는 무엇이 나타났는가?</h3>
+
+            <div class="result-grid">
+
+                <article class="result-card">
+                    <span class="label">타이핑 속도</span>
+
+                    <div class="result-values">
+                        <div class="result-value">
+                            <span>OFF</span>
+                            <strong>594.67</strong>
+                        </div>
+
+                        <div class="result-value">
+                            <span>ON</span>
+                            <strong>566.00</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="result-card">
+                    <span class="label">정확도</span>
+
+                    <div class="result-values">
+                        <div class="result-value">
+                            <span>OFF</span>
+                            <strong>100.00%</strong>
+                        </div>
+
+                        <div class="result-value">
+                            <span>ON</span>
+                            <strong>99.47%</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="result-card">
+                    <span class="label">평균 소요 시간</span>
+
+                    <div class="result-values">
+                        <div class="result-value">
+                            <span>OFF</span>
+                            <strong>5.79초</strong>
+                        </div>
+
+                        <div class="result-value">
+                            <span>ON</span>
+                            <strong>6.06초</strong>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+
+            <div class="change-list">
+                <div class="change-item">
+                    <span>타이핑 속도</span>
+                    <strong>-4.82%</strong>
+                </div>
+
+                <div class="change-item">
+                    <span>정확도</span>
+                    <strong>-0.53%p</strong>
+                </div>
+
+                <div class="change-item">
+                    <span>평균 소요 시간</span>
+                    <strong>+4.65%</strong>
+                </div>
+            </div>
+
+            <div class="judgment">
+                <strong>하지만, 가설을 그대로 받아들이지는 않았습니다.</strong>
+
+                <p>
+                    전체 평균에서는 ON 조건의 타이핑 속도가 낮고
+                    소요 시간이 길어 가설과 같은 방향의 차이가 나타났습니다.
+                    그러나 동일 문장을 비교했을 때 결과의 방향이
+                    일관되지 않았습니다. 따라서 이번 실험만으로
+                    시각적 효과가 타이핑 성능을 저하시킨다고
+                    단정하지 않았습니다.
+                </p>
+            </div>
+        </section>
+
+
+        <section class="section">
+            <p class="section-label">04 · MY JUDGMENT</p>
+
+            <h3>결과를 보고 무엇을 판단했는가?</h3>
+
+            <p>
+                동일 문장을 비교했을 때 ON 조건이 더 빠른 문장도 있었고,
+                OFF 조건이 더 빠른 문장도 있었습니다.
+                특히 문장별 결과가 일관되지 않았기 때문에
+                전체 평균의 차이만으로 인과관계를 주장하기 어렵다고 판단했습니다.
+            </p>
+
+            <p>
+                최종적으로 가설을 수정하거나 결과에 맞춰 바꾸지 않고,
+                원래 가설은 그대로 유지한 상태에서
+                <strong>“이번 실험에서는 가설이 충분히 지지되지 않았다”</strong>고
+                판정했습니다.
+            </p>
+        </section>
+
+
+        <section class="section">
+            <p class="section-label">05 · MY WORK</p>
+
+            <h3>프로젝트에서 내가 한 일</h3>
+
+            <p>
+                연구 주제를 정하고 측정 가능한 형태로 범위를 좁힌 뒤,
+                실험을 직접 수행하고 원자료를 확인했습니다.
+                이후 Python 분석 코드를 통해 조건별 결과를 계산하고
+                그래프와 CSV 결과를 확인했습니다.
+            </p>
+
+            <div class="work-flow">
+                <span class="work-step">질문 설정</span>
+                <span class="arrow">→</span>
+                <span class="work-step">가설 설정</span>
+                <span class="arrow">→</span>
+                <span class="work-step">실험 설계</span>
+                <span class="arrow">→</span>
+                <span class="work-step">데이터 수집</span>
+                <span class="arrow">→</span>
+                <span class="work-step">Python 분석</span>
+                <span class="arrow">→</span>
+                <span class="work-step">결과 판단</span>
+                <span class="arrow">→</span>
+                <span class="work-step">논문 작성</span>
+            </div>
+        </section>
+
+
+        <section class="section">
+            <p class="section-label">06 · PROJECT</p>
+
+            <h3>직접 확인하기</h3>
+
+            <p>
+                연구의 전체 과정은 논문에서 확인할 수 있고,
+                실제 실험 화면과 분석 코드는 프로젝트 저장소에서
+                확인할 수 있습니다.
+            </p>
+
+            <div class="links">
+
+                <a
+                    class="project-link"
+                    href="paper/final_paper.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <span>최종 논문</span>
+                    <span>↗</span>
+                </a>
+
+                <a
+                    class="project-link"
+                    href="experiment.html"
+                >
+                    <span>실험 직접 해보기</span>
+                    <span>→</span>
+                </a>
+
+                <a
+                    class="project-link"
+                    href="https://github.com/mingming-01/typing-focus-research"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <span>GitHub 저장소</span>
+                    <span>↗</span>
+                </a>
+
+            </div>
+        </section>
+
+
+        <footer class="footer">
+            T10 · AI와 함께 쓰는 첫 논문<br>
+            연구 결과와 판단 과정을 함께 기록한 프로젝트
+        </footer>
+
+    </main>
 </body>
 </html>
